@@ -1,3 +1,8 @@
+/*
+Autor: Lauro Ailva
+*/
+
+
 package sourceModelo;
 
 import java.io.Serializable;
