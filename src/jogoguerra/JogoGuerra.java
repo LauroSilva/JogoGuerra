@@ -4,7 +4,6 @@
  */
 package jogoguerra;
 import javax.swing.UIManager;
-import rede.JanelaServidor;
 import sourceGui.*;
 /**
  *
@@ -23,11 +22,9 @@ public class JogoGuerra {
     catch (Exception ex) {
       ex.printStackTrace();
     }
-    //..new ControloGui();
-    //..ControloGui.config.carregarTheme();
-    //..ControloGui.config.carregarVeloc();
-    //..ControloGui.guiJanelPrincipal = new JanelaPrincipal();
-    new JanelaServidor().setVisible(true);
-    
+    new ControloGui();
+    ControloGui.config.carregarTheme();
+    ControloGui.config.carregarVeloc();
+    ControloGui.guiJanelPrincipal = new JanelaPrincipal();
   }
 }

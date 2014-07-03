@@ -25,7 +25,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 
-//import com.sun.awt.AWTUtilities; 
+import com.sun.awt.AWTUtilities; 
 
 public class JConfiguracao extends JDialog {
 
@@ -213,7 +213,7 @@ public class JConfiguracao extends JDialog {
     
     setSize(350,350);
     setUndecorated(true);
-//    AWTUtilities.setWindowOpacity(this, 0.90F);  
+    AWTUtilities.setWindowOpacity(this, 0.90F);  
     setLocation(new Point(posWith,posHeight)); //    setLocation(new Point(700,250));
     //setLocationRelativeTo(null);
     
@@ -261,7 +261,7 @@ public class JConfiguracao extends JDialog {
   
   public void opacity(JDialog frame,Float opacityF)
   {
-//    AWTUtilities.setWindowOpacity(frame,opacityF); 
+    AWTUtilities.setWindowOpacity(frame,opacityF); 
   }
   
   public int getModeGame()

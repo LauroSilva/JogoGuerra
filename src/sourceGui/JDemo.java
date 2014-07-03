@@ -24,7 +24,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 
-//import com.sun.awt.AWTUtilities; 
+import com.sun.awt.AWTUtilities; 
 
 public class JDemo extends JDialog {
   
@@ -102,7 +102,7 @@ public class JDemo extends JDialog {
     
     setSize(350,400);
     setUndecorated(true);
-//    AWTUtilities.setWindowOpacity(this, 0.90F);  
+    AWTUtilities.setWindowOpacity(this, 0.90F);  
     setLocation(new Point(posWith,posHeight)); //    setLocation(new Point(700,250));
     //setLocationRelativeTo(null);
     setVisible(true);

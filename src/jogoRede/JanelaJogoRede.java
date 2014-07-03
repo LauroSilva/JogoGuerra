@@ -1,4 +1,4 @@
-package sourceGui;
+package jogoRede;
 
 import sourceModelo.*;
 import sourceGuiControlo.*;
@@ -7,16 +7,28 @@ import sourceGuiControlo.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.border.TitledBorder;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory; 
 
-import com.sun.awt.AWTUtilities; 
+
+//import com.sun.awt.AWTUtilities;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.util.Scanner;
+import rede.Servidor;
+import static rede.Servidor.jogo;
+import sourceGui.ControloGui;
+import sourceGui.JanelaDadosJogo;
 
 
-public class JanelaJogo extends JFrame{
+public class JanelaJogoRede extends JFrame{
   protected int jJogar1 = 0;
   protected int jJogar2 = 0;
+  
+  public String ip;
+  public int porta;
   
   public static boolean execut,estNovo,estReiniciar,estContinuar,estSairJogo;
   public static boolean jogarBool,novoJogoBool,runBool,rstartBool,contBool,exitBool,restart,run;
@@ -29,10 +41,20 @@ public class JanelaJogo extends JFrame{
   protected int numMaxPart =0;
   protected int contJogada=0;
   
-  public Baralho baralho = new Baralho();
-  public static Jogo jogo = new Jogo();
-  public Songs sons = new Songs();
+  
+  /****ATT******ATT***ATT*****ATT****ATT****ATT****ATT****ATT*****ATT****ATT*******ATT********ATT****** */
+  /*
+    public Baralho baralho = new Baralho();
+    public static Jogo jogo = new Jogo();
+    public Songs sons = new Songs();
+  */
 
+  public PrintWriter escritor;
+  public String nome;
+  public Socket socket;
+  public Scanner leitor;
+  public static Jogo jogoLocal;
+  
   
   public InternalRunnableTimeRunGame gameRun;// = new InternalRunnableTimeRunGame();
   
@@ -51,11 +73,27 @@ public class JanelaJogo extends JFrame{
   private JLabel jlbdc1,jlbdc2;
   
   
-  public JanelaJogo()
-  {
+  private JLabel jlbNumJogos,jlbPlayer1,jlbPlayer2;
+  private JTextField jtfNumJogos,jtfPlayer1,jtfPlayer2;
+  private JButton jbtEnviarSms;
+  
+  
+  public PanelDadosChat panelDadosJogo;
+  
+  
+  public JanelaJogoRede(Jogo jogo,String nome,String ip,int porta)
+  {  
+
+      this.ip = ip;
+      this.porta = porta;
+      this.nome = nome;
+      
+    jogoLocal = new Jogo( );
+    
+
+      
     gameRun = new InternalRunnableTimeRunGame();
   
-    
     run = true;
     execut = false;
     jogarBool = false;
@@ -84,18 +122,37 @@ public class JanelaJogo extends JFrame{
     numMaxPartida = new JLabel("Maximo de Partida: "+JanelaDadosJogo.batalhas); numMaxPartida.setFont(font); numMaxPartida.setForeground(new Color(250,10,10));
     numPartida = new JLabel("Partidas Efec.: "+numPart); numPartida.setFont(font); numPartida.setForeground(new Color(255,255,255));
     
-    jlbdc1 = new JLabel("<-- "+JanelaDadosJogo.sj1);     jlbdc1.setFont(font); jlbdc1.setForeground(new Color(255,255,255));
-    jlbdc2 = new JLabel(""+JanelaDadosJogo.sj2+" -->");     jlbdc2.setFont(font); jlbdc2.setForeground(new Color(255,255,255));
-    
+    jlbdc1 = new JLabel("<-- "+"Aires Velozo");     jlbdc1.setFont(font); jlbdc1.setForeground(new Color(255,255,255));
+    jlbdc2 = new JLabel(""+"Manuel Meneses"+" -->");     jlbdc2.setFont(font); jlbdc2.setForeground(new Color(255,255,255));
     
     panelPrincipal = new ImagemFundoModelo(ControloGui.config.imgTheme[ControloGui.config.pos][1]);
-   
+   jlbNumJogos = new JLabel("Nº Jogos: ");
+    jlbPlayer1 = new JLabel("Player 1: ");
+    jlbPlayer2 = new JLabel("Player 2: ");
+    
+    jtfNumJogos = new JTextField("");
+    jtfPlayer1 = new JTextField("");
+    jtfPlayer2 = new JTextField("");
+    configuararrede();
+    
+    if(jogoLocal.idPlayer == 1){
+    
+        panelDadosJogo = new PanelDadosChat(nome,ip, nome, "",""+jogoLocal.numBatalha, "0");
+    }
+    
+    else{
+        
+        panelDadosJogo = new PanelDadosChat(nome,ip, jogoLocal.jogador1.getNome() , nome, "", "0");
+        
+    }
    
     panelMenu= new JPanel();
     
     
     jbtPause  = new JButton(new ImageIcon(this.getClass().getResource("../img/pause3.png")));
     jbtPause.setContentAreaFilled(false);
+    
+    jbtEnviarSms = new JButton();
     
     
     jbtFechar = new JButton(new ImageIcon(this.getClass().getResource("../img/fechar_edited.png")));
@@ -151,8 +208,12 @@ public class JanelaJogo extends JFrame{
     jlbCartaJ2 = new JLabel( new ImageIcon(this.getClass().getResource("../img/white.png")));
 
     
+    //panelDadosJogo.setBorder(line);  
+    
+    
     panelPrincipal.setLayout(null);
     panelPrincipal.setBorder(line);
+    
     instanciarCartasJogadoresPorPanel();
     
     jbtMinimizar.setBounds(720,4,30,30);
@@ -184,6 +245,27 @@ public class JanelaJogo extends JFrame{
     
     jlbMesaJogo.setBounds(270,160,250,230);
     
+    /******************************/
+    // jlbNumJogos,jlbPlayer1,jlbPlayer2;
+    // jtfNumJogos,jtfPlayer1,jtfPlayer2;
+    // jbtEnviarSms;
+  
+      panelDadosJogo.setBounds(800,0,260,560);
+ 
+                
+    // panelDetalheJogo.setBounds(804,10,190,200);
+    // jlbNumJogos.setBounds(845,20,180,20);
+    // jlbPlayer1.setBounds(845,20,180,20);
+    // jlbPlayer2.setBounds();
+     
+    // add(jlbNumJogos);
+     
+    
+    /******************************/
+    
+    
+    
+    
     
     panelPrincipal.add(jlbCartaJogador2);
     panelPrincipal.add(jlbCartaJogador1);
@@ -191,13 +273,13 @@ public class JanelaJogo extends JFrame{
     panelPrincipal.add(jbtMinimizar);
     panelPrincipal.add(jbtFechar); 
     
-    panelPrincipal.add(jbtPause);
+    // panelPrincipal.add(jbtPause);  // .ApagarS
     
     panelPrincipal.add(jlbGuerra);
     panelPrincipal.add(numMaxPartida);
     
-    panelPrincipal.add(lg1);//
-    panelPrincipal.add(lg2);//
+    panelPrincipal.add(lg1);
+    panelPrincipal.add(lg2);
     panelPrincipal.add(jlbMesaJogo);
     panelPrincipal.add(jlbCartaJ1);  
     panelPrincipal.add(jlbCartaJ2);  
@@ -207,6 +289,11 @@ public class JanelaJogo extends JFrame{
     
     panelPrincipal.add(numPartida);
     panelPrincipal.add(numPartida);
+    
+    
+    // panelDadosJogo.add(panelDetalheJogo);
+
+    
     
     ultmimoCartaJ1=25;
     numCartas=25;
@@ -218,15 +305,20 @@ public class JanelaJogo extends JFrame{
     jbtFechar.addActionListener(eventos);
     jbtMinimizar.addActionListener(eventos);
     jbtPause.addActionListener(eventos);
+    // panelDadosJogo.jbtEnviar.addActionListener(eventos);
     
+    
+    // Thread do Cliente...
     
     instanciarCartasJogadoresPorPanel();
     porPanelCartas();
+    
     criarGui();
     
     /*  Elementos Adicional  */
-     comecarJogoGui();
-     gameRun.start();
+    //JOptionPane.showMessageDialog(null,""+ Servidor.jogo.jogador1.getCartas().getFrente().getElemento().chave() );
+    comecarJogoGui();
+    gameRun.start();
     
   }
   
@@ -235,10 +327,12 @@ public class JanelaJogo extends JFrame{
     setLayout(null);
     panelPrincipal.setBounds(0,0,800,560);
     add(panelPrincipal);
+    add(panelDadosJogo);
     
-    setSize(800,560);
-    setUndecorated(true);
-    AWTUtilities.setWindowOpacity(this, 0.95F);  
+    
+    setSize(1060,560);
+    setUndecorated(true); //true
+    // AWTUtilities.setWindowOpacity(this, 0.95F);  
     setLocationRelativeTo(null);
     setVisible(true);
     
@@ -258,21 +352,7 @@ public class JanelaJogo extends JFrame{
       {
         setExtendedState(JFrame.ICONIFIED);
       }
-      if(ev.getSource()==jbtPause){
-        gameRun.suspend();
-        ControloGui.guiPause = new JPauseGame(null,true,gameRun);
-      }
-      if(JPauseGame.novo){
-        novoJogoBool = true;
-      }
-      if(JPauseGame.sair)
-      {
-        ControloGui.guiJanelPrincipal = new JanelaPrincipal();
-        ControloGui.guiJanelaJogo.dispose();
-        run = false;
-        exitBool = false;
-      }
-      JPauseGame.inicBotton(false);
+
     }
     
   }
@@ -310,21 +390,21 @@ public class JanelaJogo extends JFrame{
   public void jogarJogador1()
   {
     jlbJ1[ultmimoCartaJ1].setIcon( new ImageIcon(this.getClass().getResource("../img/white.png")) );
-    jlbCartaJogador1.setIcon( new ImageIcon(this.getClass().getResource( jogo.getCartaJogador1() )));
+    jlbCartaJogador1.setIcon( new ImageIcon(this.getClass().getResource( jogoLocal.getCartaJogador1() )));
   }
   
   public void jogarJogador2(){
     jlbJ2[ultmimoCartaJ2].setIcon( new ImageIcon(this.getClass().getResource("../img/white.png")) );
-    jlbCartaJogador2.setIcon( new ImageIcon(this.getClass().getResource( jogo.getCartaJogador2() )));
+    jlbCartaJogador2.setIcon( new ImageIcon(this.getClass().getResource(jogoLocal.getCartaJogador2() )));
     
   }
   
   public void verifEnpateGui()
   {
-    if(jogo.verifEnpate() ){
+    if(jogoLocal.verifEnpate() ){
       jlbGuerra.setVisible(true);
-      lg1.setIcon( new ImageIcon(this.getClass().getResource( jogo.getCartaMesaJ1()  )));
-      lg2.setIcon( new ImageIcon(this.getClass().getResource( jogo.getCartaMesaJ2()  )));
+      lg1.setIcon( new ImageIcon(this.getClass().getResource( jogoLocal.getCartaMesaJ1()  )));
+      lg2.setIcon( new ImageIcon(this.getClass().getResource( jogoLocal.getCartaMesaJ2()  )));
     }
     else{
       jlbGuerra.setVisible(false);
@@ -333,15 +413,16 @@ public class JanelaJogo extends JFrame{
     }
   }
   
+  
   public void redemencionePanelJ1(){
     int limite=0;
-    NodoFila frenteAuxJ1 = jogo.jogador1.getCartas().getFrente();
+    NodoFila frenteAuxJ1 = jogoLocal.jogador1.getCartas().getFrente();
     
-    if(jogo.jogador1.getCartas().getNumElemento()<=26)
+    if(jogoLocal.jogador1.getCartas().getNumElemento()<=26)
     {
-      limite = jogo.jogador1.getCartas().getNumElemento();
+      limite = jogoLocal.jogador1.getCartas().getNumElemento();
       for(int j=25;j>=0;j--)
-      { 
+      {
         if(limite==0){
           jlbJ1[j].setIcon( new ImageIcon(this.getClass().getResource("../img/white.png")));
         }else{
@@ -360,14 +441,16 @@ public class JanelaJogo extends JFrame{
          try { Thread.sleep (ControloGui.config.velocidade); } catch (InterruptedException ex) {}
       }
     }
+    
+    
   }
   
   public void redemencionePanelJ2(){
     int limite=0;
-    NodoFila frenteAuxJ2 = jogo.jogador2.getCartas().getFrente();
-    if(jogo.jogador2.getCartas().getNumElemento()<26)
+    NodoFila frenteAuxJ2 = jogoLocal.jogador2.getCartas().getFrente();
+    if(jogoLocal.jogador2.getCartas().getNumElemento()<26)
     {
-      limite = jogo.jogador2.getCartas().getNumElemento();
+      limite = jogoLocal.jogador2.getCartas().getNumElemento();
       for(int j=25;j>=0;j--)
       { 
         if(limite==0){
@@ -390,7 +473,6 @@ public class JanelaJogo extends JFrame{
         try { Thread.sleep (ControloGui.config.velocidade); } catch (InterruptedException ex) {}
       }
     }
-  
     
   }
   
@@ -414,10 +496,12 @@ public class JanelaJogo extends JFrame{
   {
     int nLinhas = 50;
     
-    NodoFila frenteAuxJ1 = jogo.jogador1.getCartas().getFundo();
-    NodoFila frenteAuxJ2 = jogo.jogador2.getCartas().getFundo();
+    NodoFila frenteAuxJ1 = jogoLocal.jogador1.getCartas().getFundo();
+    NodoFila frenteAuxJ2 = jogoLocal.jogador2.getCartas().getFundo();
     
     for(int i=0;i<26;i++){
+      // JOptionPane.showMessageDialog(null,""+((Carta) frenteAuxJ1.getElemento()).getPicture() );
+      
       jlbJ1[i].setIcon( new ImageIcon(this.getClass().getResource( ((Carta) frenteAuxJ1.getElemento()).getPicture() )));
       jlbJ2[i].setIcon( new ImageIcon(this.getClass().getResource( ((Carta) frenteAuxJ2.getElemento()).getPicture() )));
       
@@ -432,42 +516,45 @@ public class JanelaJogo extends JFrame{
   
   public void comecarJogoGui()
   {
-    jogo.novoJogo();
-    distribuirJogoGui();
-
+    // ------------------------------------------------------------
+    // Servidor.jogo.novoJogo();
+     // new Thread(new CreateCliente()).start();
+     // JOptionPane.showMessageDialog(null,"Id Player: "+jogoLocal.idPlayer);
+     distribuirJogoGui();
+     ocultarCartasAdversario();
   }
   
   public void reiniciarJogoGui()
   {
     batalhas = 1;
     limparTudo();
-    jogo.reiniciarJogo();
-    redemencionePanelJ1();
-    redemencionePanelJ2();
+    jogoLocal.reiniciarJogo();
+    redemencionarOcultarJ1();
+    redemencionarOcultarJ2();
   }
   
   public void novoJogoGui()
   {
     batalhas = 1;
     limparTudo();
-    jogo.novoJogo();
-    jogo.jogador1.estatisticaJogo.inicializar();
-    jogo.jogador2.estatisticaJogo.inicializar();
+    jogoLocal.novoJogo();
+    jogoLocal.jogador1.estatisticaJogo.inicializar();
+    jogoLocal.jogador2.estatisticaJogo.inicializar();
     
     receberDadosJogo();
     
-    redemencionePanelJ1();
-    redemencionePanelJ2();
+    redemencionarOcultarJ1();
+    redemencionarOcultarJ2();
   }
   
   public void continuarJogoGui()
   {
     batalhas = 1;
     limparTudo();
-    jogo.continuar();
+    jogoLocal.continuar();
     numMaxPartida.setText("Maximo de Partida: "+JanelaDadosJogo.batalhas);
-    redemencionePanelJ1();
-    redemencionePanelJ2();
+    redemencionarOcultarJ1();
+    redemencionarOcultarJ2();
   }
   
   
@@ -477,8 +564,8 @@ public class JanelaJogo extends JFrame{
     jlbdc1.setText("<-- "+JanelaDadosJogo.sj1);
     jlbdc2.setText(""+JanelaDadosJogo.sj2+" -->");
     
-    jogo.jogador1.setNome(JanelaDadosJogo.sj1);
-    jogo.jogador2.setNome(JanelaDadosJogo.sj2);
+    jogoLocal.jogador1.setNome(JanelaDadosJogo.sj1);
+    jogoLocal.jogador2.setNome(JanelaDadosJogo.sj2);
   }
   
   
@@ -490,26 +577,8 @@ public class JanelaJogo extends JFrame{
     {}
     public void run() {
       try { Thread.sleep (1000); } catch (InterruptedException ex) {}
-      while(run){
-        
+      while(true){
         jogarGuiRun();
-        if(novoJogoBool)
-        {
-          ControloGui.guiJanelaDadosJogo = new JanelaDadosJogo(null,true,500,250,"Novo Jogo Pause");
-          novoJogoGui();
-          novoJogoBool = false;
-        }
-        if(contBool){
-          ControloGui.guiJanelaDadosJogo = new JanelaDadosJogo(null,true,500,250,false);
-          continuarJogoGui();
-          contBool = false;
-        }
-        if(exitBool){
-          ControloGui.guiJanelPrincipal = new JanelaPrincipal();
-          ControloGui.guiJanelaJogo.dispose();
-          run = false;
-          exitBool = false;
-        }
       }
     }
   }
@@ -526,8 +595,8 @@ public class JanelaJogo extends JFrame{
     
     jlbJ1[25].setLocation(40, 350);
     jlbJ2[25].setLocation(636, 350);
-    redemencionePanelJ1();
-    redemencionePanelJ2();
+    redemencionarOcultarJ1();
+    redemencionarOcultarJ2();
   }
   
   
@@ -539,4 +608,230 @@ public class JanelaJogo extends JFrame{
     estSairJogo = false;
   }
   
+  public void configuararrede(){
+     try{
+         //"127.0.0.1"
+          socket = new Socket(ip,porta);
+          System.out.println("Conectado...");
+          escritor = new PrintWriter(socket.getOutputStream());
+          leitor = new Scanner(socket.getInputStream() );
+            //===================================================
+                try{
+                ObjectInputStream ois = new ObjectInputStream(socket.getInputStream() );
+                ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+                
+                oos.writeObject(nome);
+                
+                this.jogoLocal = (Jogo) ois.readObject();
+                
+                
+                if(jogoLocal.idPlayer == 2)
+                {
+                    jtfPlayer1.setText(jogoLocal.jogador1.getNome());
+                    
+                    jlbdc1.setText(jogoLocal.jogador1.getNome());
+                    
+                    jlbdc2.setText(nome);
+                    
+                    panelDadosJogo.setNomeJg1(jogoLocal.jogador1.getNome());
+                    
+                    panelDadosJogo.setNomeJg2(nome);
+                }
+                
+                else
+                {
+                    jlbdc2.setText("Wait for another client");
+                    
+                    panelDadosJogo.setNomeJg1(nome);
+                }
+                
+                panelDadosJogo.setNumBatalha(""+jogoLocal.numBatalha);
+                
+                System.out.println("Meteu o Jogo");
+                // ois.close();
+                }catch(Exception ex){
+                    System.out.println("Deu pau....");
+                }
+             // jtaHistorico.append(jogo.toString()+"\n" );
+             // jtaHistorico.append("HAHAHAHAHAHAH\n" );
+            new Thread(new EscutaServidor()).start();
+        }catch(Exception ex){}
+        
+    }
+  
+  
+    private class EscutaServidor implements Runnable{
+        
+        boolean actualiza = true;
+        
+        @Override
+        public void run(){
+            try{
+                String texto;
+                while((texto = leitor.nextLine()) != null){
+                   
+                    if(texto.equalsIgnoreCase("Joguei1")){
+                        //JOptionPane.showMessageDialog(null,"Jogador 1 ja jogou");
+                        jogarAutomaticoRede();
+                    }
+                    else if(texto.equalsIgnoreCase("Joguei2")){
+                        // JOptionPane.showMessageDialog(null,"Jogador 2 ja jogou");
+                        jogarAutomaticoRede();
+                    }
+                    if(texto.equalsIgnoreCase("limpar")){
+                        try { Thread.sleep (800); } catch (InterruptedException ex) {}
+                        limparMesa();
+                    }
+                    
+                    else{
+                        
+                        if(actualiza && jogoLocal.idPlayer == 1)
+                        {
+                            JOptionPane.showMessageDialog(null, "O Jogador " + texto + "Conectou-se ao Jogo\n\tIniciar o Jogo");
+
+                            jtfPlayer1.setText(nome);
+
+                            jlbdc1.setText(nome);
+
+                            jlbdc2.setText(texto);
+                            
+                            panelDadosJogo.setNomeJg2(texto);
+                        }
+                        
+                        actualiza = false;
+                    }
+                    
+                    System.out.println(texto);
+                }
+                // panelDadosJogo.jtaHistorico.append(texto);
+            }
+            catch(Exception ex){}
+        }
+    }
+    
+ 
+ 
+  
+  // Reparar os Metodos...
+  
+  
+  public void jogarAutomaticoRede(){
+      if(jogoLocal.idPlayer == 1){
+        jogarJogador2();
+        jJogar2++;
+      }
+      else if(jogoLocal.idPlayer == 2){
+          jogarJogador1();
+          jJogar1++;
+      }
+  }
+  
+  public void jogarRedeTwoPlayer(){
+      
+      limparMesa();
+      // jogoLocal.jogarGui();
+      // verifEnpateGui();
+      //redemencionarOcultarJ1();
+      //redemencionarOcultarJ2();
+      //try{Thread.sleep(500);}catch(InterruptedException ex){}
+      //batalhas++;
+  }
+  
+  public void ocultarCartasAdversario(){
+      if(jogoLocal.idPlayer!=1){
+        for(int i=0;i<26;i++){
+          jlbJ1[i].setIcon( new ImageIcon(this.getClass().getResource("../img/1naipe.png") ) );
+        }  
+      }
+      else /* if(jogoLocal.idPlayer!=2)*/{
+        for(int j=0;j<26;j++){
+          jlbJ2[j].setIcon( new ImageIcon(this.getClass().getResource("../img/1naipe.png") ) );
+        }
+      } 
+  }
+  public void redemencionarOcultarJ1(){
+        int limite=0;
+        NodoFila frenteAuxJ1 = jogoLocal.jogador1.getCartas().getFrente();
+
+      if(jogoLocal.idPlayer==1){
+          redemencionePanelJ1();
+      } else{
+            if(jogoLocal.jogador1.getCartas().getNumElemento()<=26)
+            {
+              limite = jogoLocal.jogador1.getCartas().getNumElemento();
+              for(int j=25;j>=0;j--)
+              {
+                if(limite==0){
+                  jlbJ1[j].setIcon( new ImageIcon(this.getClass().getResource("../img/white.png")));
+                }else{
+                  jlbJ1[j].setIcon(new ImageIcon(this.getClass().getResource("../img/1naipe.png")));
+                  frenteAuxJ1 = frenteAuxJ1.getProximo();
+                  limite--;
+                  try { Thread.sleep (ControloGui.config.velocidade); } catch (InterruptedException ex) {}
+                }
+              }
+            }
+            else{
+              for(int j=25;j>=0;j--)
+              { 
+                jlbJ1[j].setIcon(new ImageIcon(this.getClass().getResource("../img/1naipe.png")));
+                frenteAuxJ1 = frenteAuxJ1.getProximo();
+                 try { Thread.sleep (ControloGui.config.velocidade); } catch (InterruptedException ex) {}
+              }
+            } 
+      }
+  }
+   
+  
+  public void redemencionarOcultarJ2(){
+        int limite=0;
+        NodoFila frenteAuxJ2 = jogoLocal.jogador2.getCartas().getFrente();
+
+      if(jogoLocal.idPlayer==2){
+          redemencionePanelJ2();
+      }else{
+        if(jogoLocal.jogador2.getCartas().getNumElemento()<26)
+            {
+              limite = jogoLocal.jogador2.getCartas().getNumElemento();
+              for(int j=25;j>=0;j--)
+              { 
+                if(limite==0){
+                  jlbJ2[j].setIcon( new ImageIcon(this.getClass().getResource("../img/white.png")));
+                }else{
+
+                  jlbJ2[j].setIcon(new ImageIcon(this.getClass().getResource("../img/1naipe.png")));
+                  frenteAuxJ2 = frenteAuxJ2.getProximo();
+                  limite--;
+                  try { Thread.sleep (ControloGui.config.velocidade); } catch (InterruptedException ex) {}
+                }
+              }
+            }
+            else{
+              for(int j=25;j>=0;j--)
+              { 
+                jlbJ2[j].setIcon(new ImageIcon(this.getClass().getResource("../img/1naipe.png")));
+                frenteAuxJ2 = frenteAuxJ2.getProximo();
+                try { Thread.sleep (ControloGui.config.velocidade); } catch (InterruptedException ex) {}
+              }
+            }
+      }
+      
+  }
+  
+  
+  public void configJogoRede(){
+      
+  }
+  
+  
+  public static void main(String[] args){
+    try
+    {
+      UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+    }
+    catch (Exception ex) {
+      ex.printStackTrace();
+    }
+     // ControloGui.guiJanelaJogo = new ModoManual(new Jogo() );
+  }
 }

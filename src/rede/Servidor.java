@@ -48,7 +48,6 @@ public class Servidor extends javax.swing.JFrame {
         
         // JOptionPane.showMessageDialog(null,""+jogo.baralho.getCarta()[0].getPicture() );
         initComponents();
-        setLocationRelativeTo(null);
         new Thread(new CriarServerThread()).start(); 
         new Thread(new ChatServer()).start();
        // new Thread(new CriaServerChat() ).start();
@@ -93,6 +92,7 @@ public class Servidor extends javax.swing.JFrame {
             
              ObjectInputStream input;
              ObjectOutputStream output; 
+             PrintWriter escritor;
 
             try{
                 server = new ServerSocket(5000);
@@ -105,7 +105,22 @@ public class Servidor extends javax.swing.JFrame {
                       Socket socket = server.accept(); 
                       try{
                          output = new ObjectOutputStream(socket.getOutputStream() );
-                         jogo.idPlayer = contIdPlayer; contIdPlayer++;
+                         input = new ObjectInputStream(socket.getInputStream());
+                         
+                         jogo.idPlayer = contIdPlayer; 
+                         
+                         if (contIdPlayer == 1)
+                             
+                             jogo.jogador1.setNome(""+input.readObject());
+                         
+                         else
+                         {
+                             jogo.jogador2.setNome(""+input.readObject());
+                             
+                             encaminharCliente1(jogo.jogador2.getNome());
+                         }
+                             
+                         contIdPlayer++;
                          DefinicaoJogo();
                          output.writeObject(jogo);
                          output.flush();
@@ -116,10 +131,6 @@ public class Servidor extends javax.swing.JFrame {
                       finally{ }
                       //==================================================
                       System.out.println("Cliente: "+cont+" Conectado"); cont++;
-                      
-                      PrintWriter escritor = new PrintWriter(socket.getOutputStream() );
-                       escritor.println("Ola");
-                       escritor.flush();
                       
                     new Thread(new EscutaCliente(socket)).start();
                     PrintWriter p = new PrintWriter(socket.getOutputStream() );
@@ -180,7 +191,7 @@ public class Servidor extends javax.swing.JFrame {
     
     
     public void DefinicaoJogo(){
-        jogo.numBatalha = 26;
+        jogo.numBatalha = 13;
     }
     
     

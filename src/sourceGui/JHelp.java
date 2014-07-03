@@ -24,7 +24,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 
-//import com.sun.awt.AWTUtilities; 
+import com.sun.awt.AWTUtilities; 
 
 public class JHelp extends JDialog {
   

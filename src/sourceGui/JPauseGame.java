@@ -2,16 +2,28 @@ package sourceGui;
 
 import sourceGuiControlo.*;
 
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.border.Border;
 import javax.swing.BorderFactory; 
+import java.awt.event.MouseListener;
+
+
+import java.awt.FlowLayout;  
+import javax.swing.JFrame;  
+import javax.swing.JLabel;  
 import javax.swing.JPanel;  
+import javax.swing.JTextField;  
+import java.awt.Color;  
+import java.awt.Graphics;  
+import java.awt.Graphics2D;  
+import java.awt.Rectangle;  
+import java.awt.RenderingHints;
 
 
-//import com.sun.awt.AWTUtilities; 
+import com.sun.awt.AWTUtilities; 
 
 public class JPauseGame extends JDialog {
  
@@ -42,7 +54,6 @@ public class JPauseGame extends JDialog {
     
     jbtContinuar = new JButton(new ImageIcon(this.getClass().getResource("../img/continuar.png")));
         jbtContinuar.addMouseListener( new MouseAdapter() {  
-      @Override
       public void  mouseEntered(MouseEvent e) {
         //jbtFechar.setContentAreaFilled(true);
         jbtContinuar.setIcon(new ImageIcon(this.getClass().getResource("../img/continuarR1c.png")));
@@ -142,7 +153,7 @@ public class JPauseGame extends JDialog {
     
     setSize(300,300);
     setUndecorated(true);
-//    AWTUtilities.setWindowOpacity(this, 0.65F);  
+    AWTUtilities.setWindowOpacity(this, 0.65F);  
     setLocationRelativeTo(null);
     setVisible(true);
     

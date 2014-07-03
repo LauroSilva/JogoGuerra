@@ -11,7 +11,7 @@
   ***********************************************************************************/
 package sourceModelo;
 
-import java.io.Serializable; 
+import java.io.Serializable;
 
 public interface ElementoInterface extends Serializable
 {

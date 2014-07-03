@@ -58,13 +58,5 @@ public class Jogador implements Serializable
     
   }
   
-  public NodoFila getElementoAJogar(){
-      return cartas.getFrente();
-  }
-  
-  public String argumento(){
-      return ""+this.nome+"?"+cartas+"?"+this.pontos;
-  }
-  
   
 }

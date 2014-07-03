@@ -95,7 +95,8 @@ public class Baralho implements Serializable
     int posicao1 = 0;
     int posicao2 = 0;
     
-    while(cont<=50000)
+    
+    while(cont<=10000000)
     {
       posicao1 = new Random().nextInt(52);
       posicao2  = new Random().nextInt(52);

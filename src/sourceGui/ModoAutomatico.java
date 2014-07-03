@@ -1,6 +1,5 @@
 package sourceGui;
 import sourceGuiControlo.*;
-import rede.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -23,17 +22,15 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 
-//import com.sun.awt.AWTUtilities; 
-import sourceModelo.Jogo;
+import com.sun.awt.AWTUtilities; 
 
 
 public class ModoAutomatico extends JanelaJogo{
   
   public InternalRunnableTimeRunGame gameRun;
     
-  public ModoAutomatico(Jogo jogo)
+  public ModoAutomatico()
   {     
-      super(jogo);
     this.gameRun = new InternalRunnableTimeRunGame();
       
     numPartida.setText("Partidas Efec.: "+numPart); 
@@ -53,7 +50,7 @@ public class ModoAutomatico extends JanelaJogo{
       try { Thread.sleep (800); } catch (InterruptedException ex) {}
       
       limparMesa();
-      Servidor.jogo.jogarGui();
+      jogo.jogarGui();
       verifEnpateGui();
       
       redemencionePanelJ2();
@@ -62,7 +59,7 @@ public class ModoAutomatico extends JanelaJogo{
       batalhas++;
     }
     else{
-      ControloGui.guiEstatisicaJogo = new JEstatiscaJogo(null,true,Servidor.jogo,460,163);
+      ControloGui.guiEstatisicaJogo = new JEstatiscaJogo(null,true,jogo,460,163);
       
       if(estNovo){
         ControloGui.guiJanelaDadosJogo = new JanelaDadosJogo(null,true,500,250,"Estatistica");
@@ -92,6 +89,7 @@ public class ModoAutomatico extends JanelaJogo{
   public class InternalRunnableTimeRunGame extends Thread{
     public InternalRunnableTimeRunGame()
     {}
+    @Override
     public void run() {
       int runInt = 0;
       try { Thread.sleep (1000); } catch (InterruptedException ex) {}

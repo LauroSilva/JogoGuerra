@@ -24,7 +24,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 
-//import com.sun.awt.AWTUtilities; 
+import com.sun.awt.AWTUtilities; 
 
 public class JEscolhaNovoJogo extends JDialog {
   
@@ -97,7 +97,7 @@ public class JEscolhaNovoJogo extends JDialog {
     
     setSize(700,460);
     setUndecorated(true);
-//    AWTUtilities.setWindowOpacity(this, 0.45F);  
+    AWTUtilities.setWindowOpacity(this, 0.45F);  
     // setLocation(new Point(posWith,posHeight));
     setLocationRelativeTo(null);
     setVisible(true);

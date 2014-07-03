@@ -22,7 +22,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 
-//import com.sun.awt.AWTUtilities; 
+import com.sun.awt.AWTUtilities; 
 
 public class JanelaPrincipal extends JFrame {
  
@@ -218,7 +218,8 @@ public class JanelaPrincipal extends JFrame {
       if(ev.getSource()==jbtIniciarJogo )
       {
         visiblidade(false);
-        ControloGui.guiJanelaDadosJogo = new JanelaDadosJogo(null,true,700,250);//700,250);
+        ControloGui.chooseModePlayer = new JChooseModoPlayer(null,true);//700,250);
+        ControloGui.chooseModePlayer.setVisible(true);  
         visiblidade(true);
       }
       if(ev.getSource()==jbtAjuda )

@@ -2,7 +2,6 @@ package sourceGui;
 
 import sourceModelo.*;
 import sourceGuiControlo.*;
-import rede.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,8 +24,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 
-//import com.sun.awt.AWTUtilities; 
-import rede.Servidor;
+import com.sun.awt.AWTUtilities; 
 
 
 public class JEstatiscaJogo extends JDialog {
@@ -282,19 +280,19 @@ public class JEstatiscaJogo extends JDialog {
   
   public void setEstatistica()
   {
-    JanelaJogo.jogoLocal.resultadoFinal();
+    JanelaJogo.jogo.resultadoFinal();
     
-    jlbJogador1.setText(""+Servidor.jogo.jogador1.getNome());
-    jlbJogador2.setText(""+Servidor.jogo.jogador2.getNome());
+    jlbJogador1.setText(""+JanelaJogo.jogo.jogador1.getNome());
+    jlbJogador2.setText(""+JanelaJogo.jogo.jogador2.getNome());
     
-    jlbJ1Result.setText(""+Servidor.jogo.jogador1.getPontos() );
-    jlbJ2Result.setText(""+Servidor.jogo.jogador2.getPontos() );
+    jlbJ1Result.setText(""+JanelaJogo.jogo.jogador1.getPontos() );
+    jlbJ2Result.setText(""+JanelaJogo.jogo.jogador2.getPontos() );
     
-    jlbP2_1.setText(""+Servidor.jogo.jogador1.estatisticaJogo.numPartPerdidas); jlbP2_2.setText(""+Servidor.jogo.jogador2.estatisticaJogo.numPartPerdidas);
-    jlbP3_1.setText(""+Servidor.jogo.jogador1.estatisticaJogo.numPartidasVencidas); jlbP3_2.setText(""+Servidor.jogo.jogador2.estatisticaJogo.numPartidasVencidas);
-    jlbP4_1.setText(""+( (Servidor.jogo.jogador1.estatisticaJogo.numGuerrasVenciadas)+(Servidor.jogo.jogador1.estatisticaJogo.numGuerrasPerdidas))); jlbP4_2.setText(""+((Servidor.jogo.jogador1.estatisticaJogo.numGuerrasVenciadas)+(Servidor.jogo.jogador1.estatisticaJogo.numGuerrasPerdidas)));
-    jlbP5_1.setText(""+Servidor.jogo.jogador1.estatisticaJogo.numGuerrasVenciadas); jlbP5_2.setText(""+Servidor.jogo.jogador2.estatisticaJogo.numGuerrasVenciadas);
-    jlbP6_1.setText(""+Servidor.jogo.jogador1.estatisticaJogo.numGuerrasPerdidas); jlbP6_2.setText(""+Servidor.jogo.jogador2.estatisticaJogo.numGuerrasPerdidas);
+    jlbP2_1.setText(""+JanelaJogo.jogo.jogador1.estatisticaJogo.numPartPerdidas); jlbP2_2.setText(""+JanelaJogo.jogo.jogador2.estatisticaJogo.numPartPerdidas);
+    jlbP3_1.setText(""+JanelaJogo.jogo.jogador1.estatisticaJogo.numPartidasVencidas); jlbP3_2.setText(""+JanelaJogo.jogo.jogador2.estatisticaJogo.numPartidasVencidas);
+    jlbP4_1.setText(""+( (JanelaJogo.jogo.jogador1.estatisticaJogo.numGuerrasVenciadas)+(JanelaJogo.jogo.jogador1.estatisticaJogo.numGuerrasPerdidas))); jlbP4_2.setText(""+((JanelaJogo.jogo.jogador1.estatisticaJogo.numGuerrasVenciadas)+(JanelaJogo.jogo.jogador1.estatisticaJogo.numGuerrasPerdidas)));
+    jlbP5_1.setText(""+JanelaJogo.jogo.jogador1.estatisticaJogo.numGuerrasVenciadas); jlbP5_2.setText(""+JanelaJogo.jogo.jogador2.estatisticaJogo.numGuerrasVenciadas);
+    jlbP6_1.setText(""+JanelaJogo.jogo.jogador1.estatisticaJogo.numGuerrasPerdidas); jlbP6_2.setText(""+JanelaJogo.jogo.jogador2.estatisticaJogo.numGuerrasPerdidas);
     
   }
   
@@ -307,7 +305,7 @@ public class JEstatiscaJogo extends JDialog {
     catch (Exception ex) {
       ex.printStackTrace();
     }
-    new JEstatiscaJogo(null,true,Servidor.jogo,0,0);
+    new JEstatiscaJogo(null,true,JanelaJogo.jogo,0,0);
   }
   
 }

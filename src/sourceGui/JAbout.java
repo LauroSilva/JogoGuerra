@@ -22,7 +22,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 
-//import com.sun.awt.AWTUtilities; 
+import com.sun.awt.AWTUtilities; 
 
 public class JAbout extends JDialog{
   private JPanel principal;
@@ -74,7 +74,7 @@ public class JAbout extends JDialog{
     
     setSize(257,276);
     setUndecorated(true);
-//    AWTUtilities.setWindowOpacity(this, 0.85F); 
+    AWTUtilities.setWindowOpacity(this, 0.85F); 
     setLocationRelativeTo(null);    
 // setLocation(new Point(posWith,posHeight)); //    setLocation(new Point(700,250));$
     setVisible(true);

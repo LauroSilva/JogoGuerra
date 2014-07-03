@@ -69,60 +69,26 @@ public class ChatServer implements Runnable{
         
     }
     
-     public void run(){
+     public void run()
+     {
         ServerSocket server;
-//        jogo = new Jogo();
-  //      jogo.novoJogo();
         
-        //  PrintWriter escritor; // escrever para um cliente
-         
-        // ObjectInputStream input; //= new ObjectInputStream(s.getInputStream() );
-        // ObjectOutputStream output; // = new ObjectOutputStream(s.getOutputStream() );
-        
-        try{
+        try
+        {
             server = new ServerSocket(5001);
             System.out.println("Servidor Criado!!!");
-             JOptionPane.showMessageDialog(null,"Servidor Ligado...");
             
-            while(true){
+            while(true)
+            {
                   Socket socket = server.accept();
                   System.out.println("Cliente: "+cont+" Conectado"); cont++;
-                  PrintWriter escritor = new PrintWriter(socket.getOutputStream() );
-                  escritor.println("Caralho");
-                   // System.out.println("Servidor:...\n"+jogo);
-                  
-                   // escritor.println(enviarGame() );
                    
-                   escritor.flush();
-                   
-                   
-                   // System.out.println(""+leitors.nextLine() );
-                  
-                  // escritor = new PrintWriter(socket.getOutputStream() );
-                  // escritor.println("Welcome Cliente "+cont);
-          
-   
-                  
-                  //output.flush();
-                  //input = new ObjectInputStream(s.getInputStream() );
-                  // output = new ObjectOutputStream(s.getOutputStream() );
-                  
-                  //output.writeObject(jogo);
-                  // output.flush();
-                  // output.close();
-                
                 new Thread(new EscutaCliente(socket)).start();
                 PrintWriter p = new PrintWriter(socket.getOutputStream() );
                 escritores.add(p);
             }
-        }catch(Exception ex){
-            
         }
-     }
-    
-    
-   /* public static void main(String[] args){
-        new ChatServer();
         
-    } */
+        catch(Exception ex){}
+     }
 }

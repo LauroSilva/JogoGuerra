@@ -1,69 +1,50 @@
-package sourceGui;
-import sourceGuiControlo.*;
+package jogoRede;
 
-import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
-import javax.swing.border.TitledBorder;
-import javax.swing.border.Border;
-import javax.swing.BorderFactory; 
 import java.awt.event.MouseListener;
+import javax.swing.JOptionPane;
 
 
-import java.awt.FlowLayout;  
-import javax.swing.JFrame;  
-import javax.swing.JLabel;  
-import javax.swing.JPanel;  
-import javax.swing.JTextField;  
-import java.awt.Color;  
-import java.awt.Graphics;  
-import java.awt.Graphics2D;  
-import java.awt.Rectangle;  
-import java.awt.RenderingHints;
+import rede.Servidor;
+import sourceModelo.Jogo;
 
-
-import com.sun.awt.AWTUtilities; 
-
-public class ModoManual extends JanelaJogo {
+public class ModoManualRede extends JanelaJogoRede {
   
   private Songs sons = new Songs();
+  
   private int x,x1,sx,sx1;
   private int y,y1,sy,sy1;
   private boolean block=false;
   
   public InternalRunnableTimeRunGame gameRun;
   
-  public ModoManual()
+  public ModoManualRede(Jogo jogo,String nome,String ip,int porta)
   {
-    
+    super(jogo,nome,ip,porta);
     this.gameRun = new InternalRunnableTimeRunGame();
       
     comecarJogoGui();
     // this.gameRun.start();
     
+    if(jogoLocal.idPlayer == 1){
+        jlbJ1[25].addMouseMotionListener(new Controler());  
+        jlbJ1[25].addMouseListener(new MListener());  
+        jlbJ1[25].addMouseListener(new EventMouseL());
+        jlbJ1[25].addMouseListener( new MouseAdapter(){
+          public void  mouseEntered(MouseEvent e) {}
+          public void  mouseExited(MouseEvent e){}
+        });
+    }
     
-    jlbJ1[25].addMouseMotionListener(new Controler());  
-    jlbJ1[25].addMouseListener(new MListener());  
-    jlbJ1[25].addMouseListener(new EventMouseL());
-    
-    jlbJ1[25].addMouseListener( new MouseAdapter(){
-      public void  mouseEntered(MouseEvent e) {
-      }
-      public void  mouseExited(MouseEvent e){
-      }
-    });
-    
-    jlbJ2[25].addMouseMotionListener(new Controler1());  
-    jlbJ2[25].addMouseListener(new MListener1());  
-    jlbJ2[25].addMouseListener(new EventMouseL());
-    jlbJ2[25].addMouseListener( new MouseAdapter() {  
-      public void  mouseEntered(MouseEvent e) {
-        
-      }
-      public void  mouseExited(MouseEvent e){
-        
-      }
-    }); 
+    if(jogoLocal.idPlayer == 2){
+        jlbJ2[25].addMouseMotionListener(new Controler1());  
+        jlbJ2[25].addMouseListener(new MListener1());  
+        jlbJ2[25].addMouseListener(new EventMouseL());
+        jlbJ2[25].addMouseListener( new MouseAdapter() {  
+          public void  mouseEntered(MouseEvent e) {}
+          public void  mouseExited(MouseEvent e){}
+        });
+    }
     
   }
   
@@ -73,37 +54,8 @@ public class ModoManual extends JanelaJogo {
     public InternalRunnableTimeRunGame()
     { }
     public void run() {
-      while(run){
-
+      while(true){
         jogarGuiRun();
-        
-        if(novoJogoBool)
-        {
-          ControloGui.guiJanelaDadosJogo = new JanelaDadosJogo(null,true,500,250,"Novo Jogo Pause");
-          novoJogoGui();
-          novoJogoBool = false;
-        }
-        /*
-        if(rstartBool)
-        {
-          contBool = true;
-          rstartBool = false;
-        }
-        */
-        
-        if(contBool){
-          ControloGui.guiJanelaDadosJogo = new JanelaDadosJogo(null,true,500,250,false);
-          continuarJogoGui();
-          contBool = false;
-        }
-        
-        if(exitBool){
-          ControloGui.guiJanelPrincipal = new JanelaPrincipal();
-          ControloGui.guiJanelaJogo.dispose();
-          run = false;
-          exitBool = false;
-        }
-        
       }
     }
   }
@@ -111,27 +63,32 @@ public class ModoManual extends JanelaJogo {
     
     public void jogarGuiRun()
     {
-      if(JanelaDadosJogo.batalhas >= batalhas){
+        int cont = 0;
+        
+      if(cont < jogoLocal.numBatalha){
+          
         if( (jJogar1 > 0) && (jJogar2 > 0) ){
           try { Thread.sleep (800);} catch (InterruptedException ex) {}
           numPartida.setText("Partidas Efec.: "+numPart++);
-          jogo.jogarGui();
+          JanelaJogoRede.jogoLocal.jogarGui();
           limparMesa1();
           verifEnpateGui();
           jJogar1 = 0;
           jJogar2 = 0;
-          batalhas++;
+          cont++;
         }
       }
-      else ControloGui.guiEstatisicaJogo = new JEstatiscaJogo(null,true,jogo,460,163);   
+      
+      else JOptionPane.showMessageDialog(null,"Fim do Jogo!!!");
     }
+    
     
     public static void resetEstatistica()
     {
       estNovo = false;
-    estReiniciar = false;
-    estContinuar = false;
-    estSairJogo = false;
+      estReiniciar = false;
+      estContinuar = false;
+      estSairJogo = false;
   }
     
   
@@ -188,7 +145,12 @@ public class ModoManual extends JanelaJogo {
   public void verifPos()
   {
     if((jlbJ1[25].getX()>=jlbMesaJogo.getX() && jlbJ1[25].getX()<= jlbMesaJogo.getX()+200) && (jlbJ1[25].getY()>= jlbMesaJogo.getY() && jlbJ1[25].getY()<=jlbMesaJogo.getY()+100) ){
-      jJogar1++;
+          if(jogoLocal.idPlayer==1){
+             escritor.println("Joguei"+jogoLocal.idPlayer);
+             // JOptionPane.showMessageDialog(null,"Jogador 1 deu Duplo click");
+             escritor.flush();
+          }
+        jJogar1++;
     }
     else{
       jlbJ1[25].setLocation(40, 350);
@@ -200,7 +162,12 @@ public class ModoManual extends JanelaJogo {
   public void verifPos1()
   {
     if( (jlbJ2[25].getX()>=jlbMesaJogo.getX() && jlbJ2[25].getX()<= jlbMesaJogo.getX()+200) && (jlbJ2[25].getY()>= jlbMesaJogo.getY() && jlbJ2[25].getY()<=jlbMesaJogo.getY()+100) ){
-      jJogar2++;
+        if(jogoLocal.idPlayer==2){
+             escritor.println("Joguei"+jogoLocal.idPlayer);
+              // JOptionPane.showMessageDialog(null,"Jogador 2 deu Duplo click");
+             escritor.flush();
+        }
+        jJogar2++;
     }
     else {
       jlbJ2[25].setLocation(636, 350);
@@ -222,11 +189,21 @@ public class ModoManual extends JanelaJogo {
     public   void mouseClicked(MouseEvent e){
       if ((e.getClickCount() == 2) &&  (e.getSource()==jlbJ1[25] )  /*(e.getButton() == MouseEvent.BUTTON1)*/) {  
        // JOptionPane.showMessageDialog(null," Duplo Click! ");
+          if(jogoLocal.idPlayer==1){
+             escritor.println("Joguei"+jogoLocal.idPlayer);
+             // JOptionPane.showMessageDialog(null,"Jogador 1 deu Duplo click");
+             escritor.flush();
+          }
         jJogar1++;
         jlbJ1[25].setBounds(320,180,106,163);
       }
       if ((e.getClickCount() == 2) &&  (e.getSource()==jlbJ2[25] )  /*(e.getButton() == MouseEvent.BUTTON1)*/) {  
         //JOptionPane.showMessageDialog(null," Duplo Click1! ");
+          if(jogoLocal.idPlayer==2){
+             escritor.println("Joguei"+jogoLocal.idPlayer);
+              // JOptionPane.showMessageDialog(null,"Jogador 2 deu Duplo click");
+             escritor.flush();
+          }
         jJogar2++;
         jlbJ2[25].setBounds(380,200,106,163);
       }

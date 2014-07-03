@@ -24,8 +24,7 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 
 
-//import com.sun.awt.AWTUtilities; 
-import rede.Servidor;
+import com.sun.awt.AWTUtilities; 
 
 public class JanelaDadosJogo extends JDialog {
   
@@ -169,7 +168,7 @@ public class JanelaDadosJogo extends JDialog {
     
     setSize(350,300);
     setUndecorated(true);
-//    AWTUtilities.setWindowOpacity(this, 0.85F);  
+    AWTUtilities.setWindowOpacity(this, 0.85F);  
     setLocation(new Point(posWith,posHeight)); //    setLocation(new Point(700,250));
     setVisible(true);
   }
@@ -184,16 +183,16 @@ public class JanelaDadosJogo extends JDialog {
       if(ev.getSource()==jbtContinuar )
       {
         if(validarDados() ){
-          Servidor.jogo.jogador1.setNome(jtfNomeJ1.getText());
-          Servidor.jogo.jogador2.setNome(jtfNomeJ2.getText());
+          JanelaJogo.jogo.jogador1.setNome(jtfNomeJ1.getText());
+          JanelaJogo.jogo.jogador2.setNome(jtfNomeJ2.getText());
           // ControloGui.guiJanelaJogo = new ModoAutomatico();
-          
+          ControloGui.chooseModePlayer.dispose();
           if(ControloGui.config.modeGame == 1)
           {
-            ControloGui.guiJanelaJogo = new ModoAutomatico(new Jogo());
+            ControloGui.guiJanelaJogo = new ModoAutomatico();
           }
           else{
-            ControloGui.guiJanelaJogo = new ModoManual(new Jogo() );
+            ControloGui.guiJanelaJogo = new ModoManual();
           }
           
           // ModoAutomatico
@@ -215,8 +214,8 @@ public class JanelaDadosJogo extends JDialog {
       
       if(ev.getSource()==jbtContinuarNew){
         if(validarDados() ){
-          Servidor.jogo.jogador1.setNome(jtfNomeJ1.getText());
-          Servidor.jogo.jogador2.setNome(jtfNomeJ2.getText());
+          JanelaJogo.jogo.jogador1.setNome(jtfNomeJ1.getText());
+          JanelaJogo.jogo.jogador2.setNome(jtfNomeJ2.getText());
           //if(!JanelaJogo.execut){
           dispose();
           //}

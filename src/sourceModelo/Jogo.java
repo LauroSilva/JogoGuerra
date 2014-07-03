@@ -11,7 +11,14 @@
   ***********************************************************************************/
 package sourceModelo;
 
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.Serializable;
+import javax.swing.border.TitledBorder;
+import javax.swing.border.Border;
+import javax.swing.BorderFactory; 
 
 
 public class Jogo implements Serializable
@@ -36,7 +43,8 @@ public class Jogo implements Serializable
     mesaJogo = new TipoPilha();
   }
   
-
+  
+  
   public void distribuirCartas()
   {
     for(int i=0;i<baralho.getCarta().length;i++)
@@ -71,54 +79,6 @@ public class Jogo implements Serializable
   
   
   public void jogarGui()
-  {
-    /*
-    System.out.println("Jogador 1:"+jogador1.getCartas().mostrarTodos()  );
-    System.out.println("Jogador 2:"+jogador2.getCartas().mostrarTodos()  );
-    
-    System.out.print("MESA:  ");
-    System.out.println(mesaJogo.mostrarTodos());
-    System.out.println("\n\n");
-    */
-    mesaJogo.empilhar(jogador1.jogar().getElemento() );
-    mesaJogo.empilhar(jogador2.jogar().getElemento() );
-    
-    if(mesaJogo.getTopPilha().getElemento().chave() < mesaJogo.getTopPilha().getProximo().getElemento().chave() )
-    {
-      if(enpate)
-      {
-        jogador1.estatisticaJogo.numGuerrasVenciadas++;
-        jogador2.estatisticaJogo.numGuerrasPerdidas++;
-      }
-      while(mesaJogo.getTopPilha()!=null){
-        jogador1.getCartas().inserir(mesaJogo.desenpilharElemento().getElemento() );
-      }
-      jogador1.estatisticaJogo.numPartidasVencidas++;
-      jogador2.estatisticaJogo.numPartPerdidas++;
-      enpate = false;
-    }
-    else if(mesaJogo.getTopPilha().getElemento().chave() > mesaJogo.getTopPilha().getProximo().getElemento().chave()){
-      if(enpate)
-      {
-        jogador2.estatisticaJogo.numGuerrasVenciadas++;
-        jogador1.estatisticaJogo.numGuerrasPerdidas++;
-      }
-      while(mesaJogo.getTopPilha()!= null){
-        jogador2.getCartas().inserir(mesaJogo.desenpilharElemento().getElemento() );
-      }
-      jogador2.estatisticaJogo.numPartidasVencidas++;
-      jogador1.estatisticaJogo.numPartPerdidas++;
-      enpate = false;
-    }
-    else if( mesaJogo.getTopPilha().getElemento().chave() == mesaJogo.getTopPilha().getProximo().getElemento().chave() ){
-      // System.out.println("--------------------------------------------------------------");
-      enpate = true;
-    }
-    numBatalha--;
-  }
-
-  
-  public void jogarGui(TipoPilha mesa)
   {
     /*
     System.out.println("Jogador 1:"+jogador1.getCartas().mostrarTodos()  );

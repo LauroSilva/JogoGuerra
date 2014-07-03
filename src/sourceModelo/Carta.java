@@ -9,12 +9,9 @@
   ***
   ***********************************************************************************
   ***********************************************************************************/
-
 package sourceModelo;
 
-import java.io.Serializable; 
-
-public class Carta implements ElementoInterface 
+public class Carta implements ElementoInterface
 {
   private int valor;
   private String simbolo;
